@@ -10,4 +10,7 @@ nbproject
 # nodejs modules
 /node_modules
 
+# symlink
+/web
+
 .env
