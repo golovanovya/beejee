@@ -9,7 +9,7 @@ class JobController extends BaseController
 {
     const PER_PAGE = 3;
     
-    public function indexAction(ServerRequestInterface $request) : ResponseInterface
+    public function indexAction(ServerRequestInterface $request): ResponseInterface
     {
         $segment = $this->getSession($request);
         $flashMsg = [
@@ -42,14 +42,33 @@ class JobController extends BaseController
         ]);
     }
     
-    public function createAction(ServerRequestInterface $request) : ResponseInterface
+    public function taskFormAction(ServerRequestInterface $request, $args): ResponseInterface
+    {
+        if (isset($args['id'])) {
+            $id = (int)$args['id'] ?? null;
+            $job = $this->jobRepository->find($id);
+            if (!$job) {
+                throw new \League\Route\Http\Exception\NotFoundException("Задача не найдена");
+            }
+            $model = new \App\Models\JobForm($job->getDto());
+        } else {
+            $model = new \App\Models\JobForm();
+        }
+        
+        return $this->render('app/form', [
+            'model' => $model,
+            'isAdmin' => $this->isAdmin,
+        ]);
+    }
+    
+    public function createAction(ServerRequestInterface $request): ResponseInterface
     {
         $isPost = $request->getMethod() === 'POST';
         $segment = $this->getSession($request);
         
         $model = new \App\Models\JobForm();
         
-        if ($isPost && $model->load($request->getParsedBody()) && $model->validate()) {
+        if ($model->load($request->getParsedBody()) && $model->validate()) {
             $job = new \App\Entity\Job($model->getDto());
             $job->loadForm($model);
             if ($this->jobRepository->save($job)) {
@@ -62,16 +81,13 @@ class JobController extends BaseController
             return $this->render('app/form', [
                 'model' => $model,
                 'isAdmin' => $this->isAdmin,
-                'isNew' => true,
-                'url' => '/create'
             ]);
         }
     }
     
-    public function updateAction(ServerRequestInterface $request, $args) : ResponseInterface
+    public function updateAction(ServerRequestInterface $request, $args): ResponseInterface
     {
         $id = (int)$args['id'] ?? null;
-        $isPost = $request->getMethod() === 'POST';
         $segment = $this->getSession($request);
         
         if (!$this->isAdmin) {
@@ -85,7 +101,7 @@ class JobController extends BaseController
         }
         $model = new \App\Models\JobForm($job->getDto());
         
-        if ($isPost && $model->load($request->getParsedBody()) && $model->validate()) {
+        if ($model->load($request->getParsedBody()) && $model->validate()) {
             $job->loadForm($model);
             if ($this->jobRepository->save($job)) {
                 $segment->setFlash('successMessage', 'Задача сохранена');
@@ -95,11 +111,9 @@ class JobController extends BaseController
             return new \Laminas\Diactoros\Response\RedirectResponse('/');
         } else {
             return $this->render('app/form', [
-                    'model' => $model,
-                    'isAdmin' => $this->isAdmin,
-                    'isNew' => false,
-                    'url' => '/update/'.$id
-                ]);
+                'model' => $model,
+                'isAdmin' => $this->isAdmin
+            ]);
         }
     }
 }

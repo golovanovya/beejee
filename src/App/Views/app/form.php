@@ -26,7 +26,7 @@ $getErrors = function($model, $attribute) {
 };
 ?>
 
-<form method="POST" action="<?= $url ?>">
+<form method="POST" action="<?= $model->id ? "/update/$model->id" : '/create' ?>">
     <div class="form-group row">
         <label for="name" class="col-sm-3 col-form-label text-right">Имя:</label>
         <div class="col-sm-9">
@@ -89,7 +89,7 @@ $getErrors = function($model, $attribute) {
     <div class="form-group row">
         <div class="col-sm-3 col-form-label text-right"></div>
         <div class="col-sm-9">
-            <button type="submit" class="btn btn-primary"><?= ($isNew ? 'Добавить' : 'Сохранить') ?></button>
+            <button type="submit" class="btn btn-primary"><?= (!$model->id ? 'Добавить' : 'Сохранить') ?></button>
         </div>
     </div>
 </form>

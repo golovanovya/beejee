@@ -23,9 +23,9 @@ $router->map('GET', '/', [App\Controller\JobController::class, 'indexAction']);
 $router->map('GET', '/login', [App\Controller\SiteController::class, 'loginAction']);
 $router->map('POST', '/login', [App\Controller\SiteController::class, 'loginAction']);
 $router->map('GET', '/logout', [App\Controller\SiteController::class, 'logoutAction']);
-$router->map('GET', '/create', [App\Controller\JobController::class, 'createAction']);
+$router->map('GET', '/create', [App\Controller\JobController::class, 'taskFormAction']);
 $router->map('POST', '/create', [App\Controller\JobController::class, 'createAction']);
-$router->map('GET', '/update/{id:number}', [App\Controller\JobController::class, 'updateAction']);
+$router->map('GET', '/update/{id:number}', [App\Controller\JobController::class, 'taskFormAction']);
 $router->map('POST', '/update/{id:number}', [App\Controller\JobController::class, 'updateAction']);
 $router->middleware(new Middlewares\AuraSession());
 
