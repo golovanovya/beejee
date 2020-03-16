@@ -25,9 +25,9 @@ $router->get('/login', [App\Controller\SiteController::class, 'loginAction'])
     ->middleware(new App\Middleware\Anon());
 $router->post('/login', [App\Controller\SiteController::class, 'loginAction']);
 $router->get('/logout', [App\Controller\SiteController::class, 'logoutAction']);
-$router->get('/create', [App\Controller\JobController::class, 'taskFormAction']);
+$router->get('/create', [App\Controller\JobController::class, 'jobFormAction']);
 $router->post('/create', [App\Controller\JobController::class, 'createAction']);
-$router->get('/update/{id:number}', [App\Controller\JobController::class, 'taskFormAction'])
+$router->get('/update/{id:number}', [App\Controller\JobController::class, 'jobFormAction'])
     ->middleware(new App\Middleware\Auth());
 $router->post('/update/{id:number}', [App\Controller\JobController::class, 'updateAction']);
 $router->middleware(new Middlewares\AuraSession());

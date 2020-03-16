@@ -5,10 +5,18 @@ namespace App\Controller;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * Controller for management jobs
+ */
 class JobController extends BaseController
 {
     const PER_PAGE = 3;
     
+    /**
+     * Action to show a list of jobs
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
     public function indexAction(ServerRequestInterface $request): ResponseInterface
     {
         $segment = $this->getSession($request);
@@ -42,15 +50,17 @@ class JobController extends BaseController
         ]);
     }
     
-    public function taskFormAction(ServerRequestInterface $request, $args): ResponseInterface
+    /**
+     * Action to show a job form
+     * @param ServerRequestInterface $request
+     * @param type $args
+     * @return ResponseInterface
+     */
+    public function jobFormAction(ServerRequestInterface $request, $args): ResponseInterface
     {
         if (isset($args['id'])) {
             $id = (int)$args['id'] ?? null;
-            $job = $this->jobRepository->find($id);
-            if (!$job) {
-                throw new \League\Route\Http\Exception\NotFoundException("Задача не найдена");
-            }
-            $model = new \App\Models\JobForm($job->getDto());
+            $model = $this->getModel($id);
         } else {
             $model = new \App\Models\JobForm();
         }
@@ -61,9 +71,13 @@ class JobController extends BaseController
         ]);
     }
     
+    /**
+     * Action to create a job
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
     public function createAction(ServerRequestInterface $request): ResponseInterface
     {
-        $isPost = $request->getMethod() === 'POST';
         $segment = $this->getSession($request);
         
         $model = new \App\Models\JobForm();
@@ -85,21 +99,16 @@ class JobController extends BaseController
         }
     }
     
+    /**
+     * Action to update a job
+     * @param ServerRequestInterface $request
+     * @param [] $args
+     * @return ResponseInterface
+     */
     public function updateAction(ServerRequestInterface $request, $args): ResponseInterface
     {
         $id = (int)$args['id'] ?? null;
-        $segment = $this->getSession($request);
-        
-        if (!$this->isAdmin) {
-            $segment->setFlash('failMessage', 'Операция доступна только администратору.');
-            return new \Laminas\Diactoros\Response\RedirectResponse('/');
-        }
-        
-        $job = $this->jobRepository->find($id);
-        if (!$job) {
-            throw new \League\Route\Http\Exception\NotFoundException("Задача не найдена");
-        }
-        $model = new \App\Models\JobForm($job->getDto());
+        $model = $this->getModel($id);
         
         if ($model->load($request->getParsedBody()) && $model->validate()) {
             $job->loadForm($model);
@@ -115,5 +124,20 @@ class JobController extends BaseController
                 'isAdmin' => $this->isAdmin
             ]);
         }
+    }
+    
+    /**
+     * Get model by ID
+     * @param int $id
+     * @return \App\Models\JobForm
+     * @throws \League\Route\Http\Exception\NotFoundException
+     */
+    private function getModel(int $id)
+    {
+        $job = $this->jobRepository->find($id);
+        if (!$job) {
+            throw new \League\Route\Http\Exception\NotFoundException("Задача не найдена");
+        }
+        return new \App\Models\JobForm($job->getDto());
     }
 }
