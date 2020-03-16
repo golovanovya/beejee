@@ -58,10 +58,12 @@ class JobController extends BaseController
      */
     public function jobFormAction(ServerRequestInterface $request, $args): ResponseInterface
     {
-        if (isset($args['id'])) {
+        $segment = $this->getSession($request);
+        $model = $segment->getFlash('oldData');
+        if (!$model && isset($args['id'])) {
             $id = (int)$args['id'] ?? null;
             $model = $this->getModel($id);
-        } else {
+        } elseif (!$model) {
             $model = new \App\Models\JobForm();
         }
         
@@ -92,10 +94,8 @@ class JobController extends BaseController
             }
             return new \Laminas\Diactoros\Response\RedirectResponse('/');
         } else {
-            return $this->render('app/form', [
-                'model' => $model,
-                'isAdmin' => $this->isAdmin,
-            ]);
+            $segment->setFlash('oldData', $model);
+            return new \Laminas\Diactoros\Response\RedirectResponse("/create");
         }
     }
     
@@ -108,6 +108,7 @@ class JobController extends BaseController
     public function updateAction(ServerRequestInterface $request, $args): ResponseInterface
     {
         $id = (int)$args['id'] ?? null;
+        $segment = $this->getSession($request);
         $model = $this->getModel($id);
         
         if ($model->load($request->getParsedBody()) && $model->validate()) {
@@ -119,10 +120,8 @@ class JobController extends BaseController
             }
             return new \Laminas\Diactoros\Response\RedirectResponse('/');
         } else {
-            return $this->render('app/form', [
-                'model' => $model,
-                'isAdmin' => $this->isAdmin
-            ]);
+            $segment->setFlash('oldData', $model);
+            return new \Laminas\Diactoros\Response\RedirectResponse("/update/$id");
         }
     }
     
