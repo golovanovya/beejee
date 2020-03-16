@@ -1,13 +1,14 @@
 <?php
+
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
 
-$whoops = new \Whoops\Run;
-$whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+$whoops = new \Whoops\Run();
+$whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
 $whoops->register();
 
-    
-$container = require_once __DIR__.'/../config/container.php';
+
+$container = require_once __DIR__ . '/../config/container.php';
 
 $request = Laminas\Diactoros\ServerRequestFactory::fromGlobals(
     $_SERVER,
@@ -17,8 +18,8 @@ $request = Laminas\Diactoros\ServerRequestFactory::fromGlobals(
     $_FILES
 );
 
-$strategy = (new League\Route\Strategy\ApplicationStrategy)->setContainer($container);
-$router = (new League\Route\Router)->setStrategy($strategy);
+$strategy = (new League\Route\Strategy\ApplicationStrategy())->setContainer($container);
+$router = (new League\Route\Router())->setStrategy($strategy);
 $router->get('/', [App\Controller\JobController::class, 'indexAction']);
 $router->get('/login', [App\Controller\SiteController::class, 'loginAction'])
     ->middleware(new App\Middleware\Anon());
@@ -38,7 +39,7 @@ try {
     $response->getBody()->write($container->get(League\Plates\Engine::class)->render('app/404', ['e' => $e]));
     $response->withStatus(404);
 } catch (\Exception $e) {
-    if ((bool)getenv('DEBUG') == true) {
+    if ((bool) getenv('DEBUG') == true) {
         throw $e;
     }
     $response = new \Laminas\Diactoros\Response();
@@ -46,8 +47,4 @@ try {
     $response->withStatus(500);
 }
 
-(new Laminas\HttpHandlerRunner\Emitter\SapiEmitter)->emit($response);
-
-
-
-
+(new Laminas\HttpHandlerRunner\Emitter\SapiEmitter())->emit($response);
