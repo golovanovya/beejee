@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Validation;
 
 class JobForm
 {
+    public $id;
     public $name;
     public $email;
     public $content;
