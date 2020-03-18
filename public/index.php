@@ -29,7 +29,8 @@ $router->get('/create', [App\Controller\JobController::class, 'jobFormAction']);
 $router->post('/create', [App\Controller\JobController::class, 'createAction']);
 $router->get('/update/{id:number}', [App\Controller\JobController::class, 'jobFormAction'])
     ->middleware(new App\Middleware\Auth());
-$router->post('/update/{id:number}', [App\Controller\JobController::class, 'updateAction']);
+$router->post('/update/{id:number}', [App\Controller\JobController::class, 'updateAction'])
+    ->middleware(new App\Middleware\Auth());
 $router->middleware(new Middlewares\AuraSession());
 
 try {
