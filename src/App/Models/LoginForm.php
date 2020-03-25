@@ -7,8 +7,8 @@ class LoginForm
     public $login;
     public $password;
     
-    public $isValid = False;
-    public $isLoad = False;
+    public $isValid = false;
+    public $isLoad = false;
 
     public function __construct($params = [])
     {
@@ -28,7 +28,7 @@ class LoginForm
         foreach ($params as $attribute => $value) {
             if (property_exists($this, $attribute)) {
                 $this->$attribute = $value;
-                $this->isLoad = True;
+                $this->isLoad = true;
             }
         }
         return $this->isLoad;
@@ -38,7 +38,7 @@ class LoginForm
     {
         foreach ($users as $user => $password) {
             if ($this->login === $user && $this->password == $password) {
-                $this->isValid = True;
+                $this->isValid = true;
             }
         }
         return $this->isValid;

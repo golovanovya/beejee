@@ -42,5 +42,4 @@ class BaseController
         $response->withAddedHeader('content-type', 'application/json')->withStatus(200);
         return $response;
     }
-    
 }
