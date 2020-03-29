@@ -43,7 +43,7 @@ $container[\PDO::class] = function($c) {
     );
     return $pdo;
 };
-$container[League\Plates\Engine::class] = function($c) {
+$container['templateRenderer'] = function($c) {
     $asset = new League\Plates\Extension\Asset($c['assetsPath']);
     $template = new League\Plates\Engine($c['viewsPath']);
     $template->loadExtension($asset);
@@ -51,15 +51,23 @@ $container[League\Plates\Engine::class] = function($c) {
 };
 
 // ===== APP =========
-$container[App\Controller\SiteController::class] = function($c) {
-    $psrContainer = new \Pimple\Psr11\Container($c);
-    return new App\Controller\SiteController($psrContainer);
+$container[App\Controller\SiteController::class] = function ($c) {
+    $templateRenderer = $c['templateRenderer'];
+    $authManager = $c['authManager'];
+    $adminUsers = $c['adminUsers'];
+    return new App\Controller\SiteController($templateRenderer, $authManager, $adminUsers);
 };
-$container[App\Controller\JobController::class] = function($c) {
-    $psrContainer = new \Pimple\Psr11\Container($c);
-    return new App\Controller\JobController($psrContainer);
+$container[App\Controller\JobController::class] = function ($c) {
+    $templateRenderer = $c['templateRenderer'];
+    $jobRepository = $c['jobRepository'];
+    $authManager = $c['authManager'];
+    return new App\Controller\JobController(
+        $templateRenderer,
+        $jobRepository,
+        $authManager
+    );
 };
-$container[App\Models\JobRepository::class] = function($c) {
+$container['jobRepository'] = function($c) {
     return new App\Models\JobRepository($c[\PDO::class], $c['em']);
 };
 

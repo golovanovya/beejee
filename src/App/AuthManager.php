@@ -12,9 +12,10 @@ class AuthManager
         $segment = $session ? $session->getSegment('jobController') : null;
         
         if ($segment && $segment->get('isAdmin')) {
-            return new User('admin', 'admin');
+            $this->user = new User('admin', 'admin');
         }
-        return new User('guest');
+        $this->user = new User('guest');
+        return $this->user;
     }
     
     public function login(User $user, bool $keep = true)
@@ -44,5 +45,14 @@ class AuthManager
     public function getUser()
     {
         return $this->user;
+    }
+    
+    /**
+     * Is admin user role
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return $this->getUser() && $this->getUser()->getRole() === 'admin';
     }
 }

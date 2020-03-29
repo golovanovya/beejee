@@ -2,6 +2,14 @@
 
 namespace App\Controller;
 
+use App\AuthManager;
+use App\Entity\Job;
+use App\Models\JobForm;
+use App\Models\JobRepository;
+use App\Models\Pagination;
+use Laminas\Diactoros\Response\RedirectResponse;
+use League\Plates\Engine;
+use League\Route\Http\Exception\NotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -10,7 +18,20 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class JobController extends BaseController
 {
-    const PER_PAGE = 3;
+    private const PER_PAGE = 3;
+    
+    private $jobRepository;
+    private $authManager;
+    
+    public function __construct(
+        Engine $templateRenderer,
+        JobRepository $jobRepository,
+        AuthManager $authManager
+    ) {
+        parent::__construct($templateRenderer);
+        $this->jobRepository = $jobRepository;
+        $this->authManager = $authManager;
+    }
     
     /**
      * Action to show a list of jobs
@@ -19,7 +40,7 @@ class JobController extends BaseController
      */
     public function indexAction(ServerRequestInterface $request): ResponseInterface
     {
-        $segment = $this->getSession($request);
+        $segment = $request->getAttribute('session')->getSegment('jobController');
         $flashMsg = [
             'success' => $segment->getFlash('successMessage'),
             'fail' => $segment->getFlash('failMessage'),
@@ -28,7 +49,7 @@ class JobController extends BaseController
         $page = $q['page'] ?? 0;
         $order = $q['sort'] ?? '';
         
-        $pager = new \App\Models\Pagination(
+        $pager = new Pagination(
             $this->jobRepository->countAll(),
             (int)$page ?: 1,
             self::PER_PAGE,
@@ -44,7 +65,7 @@ class JobController extends BaseController
         return $this->render('app/index', [
             'jobs' => $jobs,
             'pager' => $pager,
-            'isAdmin' => $this->isAdmin,
+            'isAdmin' => $this->authManager->isAdmin(),
             'flashMsg' => $flashMsg,
             'q' => $q,
         ]);
@@ -53,7 +74,7 @@ class JobController extends BaseController
     /**
      * Action to show a job form
      * @param ServerRequestInterface $request
-     * @param type $args
+     * @param [] $args
      * @return ResponseInterface
      */
     public function jobFormAction(ServerRequestInterface $request, $args): ResponseInterface
@@ -64,12 +85,12 @@ class JobController extends BaseController
             $id = (int)$args['id'] ?? null;
             $model = $this->getModel($id);
         } elseif (!$model) {
-            $model = new \App\Models\JobForm();
+            $model = new JobForm();
         }
         
         return $this->render('app/form', [
             'model' => $model,
-            'isAdmin' => $this->isAdmin,
+            'isAdmin' => $this->authManager->isAdmin(),
         ]);
     }
     
@@ -82,20 +103,20 @@ class JobController extends BaseController
     {
         $segment = $this->getSession($request);
         
-        $model = new \App\Models\JobForm();
+        $model = new JobForm();
         
         if ($model->load($request->getParsedBody()) && $model->validate()) {
-            $job = new \App\Entity\Job($model->getDto());
+            $job = new Job($model->getDto());
             $job->loadForm($model);
             if ($this->jobRepository->save($job)) {
                 $segment->setFlash('successMessage', 'Задача добавлена');
             } else {
                 $segment->setFlash('failMessage', 'Произошла ошибка. Задача не создана.');
             }
-            return new \Laminas\Diactoros\Response\RedirectResponse('/');
+            return new RedirectResponse('/');
         } else {
             $segment->setFlash('oldData', $model);
-            return new \Laminas\Diactoros\Response\RedirectResponse("/create");
+            return new RedirectResponse("/create");
         }
     }
     
@@ -112,31 +133,32 @@ class JobController extends BaseController
         $model = $this->getModel($id);
         
         if ($model->load($request->getParsedBody()) && $model->validate()) {
+            $job = Job($model->getDto());
             $job->loadForm($model);
             if ($this->jobRepository->save($job)) {
                 $segment->setFlash('successMessage', 'Задача сохранена');
             } else {
                 $segment->setFlash('failMessage', 'Произошла ошибка. Задача не сохранена.');
             }
-            return new \Laminas\Diactoros\Response\RedirectResponse('/');
+            return new RedirectResponse('/');
         } else {
             $segment->setFlash('oldData', $model);
-            return new \Laminas\Diactoros\Response\RedirectResponse("/update/$id");
+            return new RedirectResponse("/update/$id");
         }
     }
     
     /**
      * Get model by ID
      * @param int $id
-     * @return \App\Models\JobForm
-     * @throws \League\Route\Http\Exception\NotFoundException
+     * @return JobForm
+     * @throws NotFoundException
      */
     private function getModel(int $id)
     {
         $job = $this->jobRepository->find($id);
         if (!$job) {
-            throw new \League\Route\Http\Exception\NotFoundException("Задача не найдена");
+            throw new NotFoundException("Задача не найдена");
         }
-        return new \App\Models\JobForm($job->getDto());
+        return new JobForm($job->getDto());
     }
 }

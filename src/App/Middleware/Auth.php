@@ -29,7 +29,7 @@ class Auth implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $user = $this->authManager->getUser();
-        if ($this->allowed !== $user->getRole() && $this->allowed !== '*') {
+        if (!$user && $this->allowed !== '*' || $this->allowed !== $user->getRole() && $this->allowed !== '*') {
             $request
                 ->getAttribute('session')
                 ->getSegment('jobController')
