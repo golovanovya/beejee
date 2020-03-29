@@ -17,20 +17,21 @@ $request = Laminas\Diactoros\ServerRequestFactory::fromGlobals(
     $_COOKIE,
     $_FILES
 );
+$container->get('authManager')->authenticate($request);
 
 $strategy = (new League\Route\Strategy\ApplicationStrategy())->setContainer($container);
 $router = (new League\Route\Router())->setStrategy($strategy);
 $router->get('/', [App\Controller\JobController::class, 'indexAction']);
 $router->get('/login', [App\Controller\SiteController::class, 'loginAction'])
-    ->middleware(new App\Middleware\Anon());
+    ->middleware(new App\Middleware\Auth($container->get('authManager'), 'guest'));
 $router->post('/login', [App\Controller\SiteController::class, 'loginAction']);
 $router->get('/logout', [App\Controller\SiteController::class, 'logoutAction']);
 $router->get('/create', [App\Controller\JobController::class, 'jobFormAction']);
 $router->post('/create', [App\Controller\JobController::class, 'createAction']);
 $router->get('/update/{id:number}', [App\Controller\JobController::class, 'jobFormAction'])
-    ->middleware(new App\Middleware\Auth());
+    ->middleware(new App\Middleware\Auth($container->get('authManager'), 'admin'));
 $router->post('/update/{id:number}', [App\Controller\JobController::class, 'updateAction'])
-    ->middleware(new App\Middleware\Auth());
+    ->middleware(new App\Middleware\Auth($container->get('authManager'), 'admin'));
 $router->middleware(new Middlewares\AuraSession());
 
 try {

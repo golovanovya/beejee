@@ -63,4 +63,6 @@ $container[App\Models\JobRepository::class] = function($c) {
     return new App\Models\JobRepository($c[\PDO::class], $c['em']);
 };
 
+$container['authManager'] = new \App\AuthManager();
+
 return new \Pimple\Psr11\Container($container);

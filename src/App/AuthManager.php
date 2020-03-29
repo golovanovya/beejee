@@ -4,25 +4,14 @@ namespace App;
 
 class AuthManager
 {
-    /**
-     *
-     * @var \Psr\Http\Message\ServerRequestInterface
-     */
-    private $request;
-    
     private $user;
     
-    public function __construct(\Psr\Http\Message\ServerRequestInterface $request)
+    public function authenticate(\Psr\Http\Message\ServerRequestInterface $request)
     {
-        $this->request = $request;
-    }
-    
-    public function authentificate()
-    {
-        $session = $this->request->getAttribute('session');
-        $segment = $session->getSegment('jobController');
+        $session = $request->getAttribute('session');
+        $segment = $session ? $session->getSegment('jobController') : null;
         
-        if (!$segment->get('isAdmin')) {
+        if ($segment && $segment->get('isAdmin')) {
             return new User('admin', 'admin');
         }
         return new User('guest');
@@ -38,14 +27,20 @@ class AuthManager
         }
     }
     
-    public function logout()
+    public function logout($request)
     {
-        $session = $this->request->getAttribute('session');
-        $segment = $session->getSegment('jobController');
-        $segment->set('isAdmin', null);
+        $session = $request->getAttribute('session');
+        $segment = $session ? $session->getSegment('jobController') : null;
+        if ($segment) {
+            $segment->set('isAdmin', null);
+        }
         $this->user = null;
     }
     
+    /**
+     * Authenticated user
+     * @return User
+     */
     public function getUser()
     {
         return $this->user;
