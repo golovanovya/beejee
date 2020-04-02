@@ -15,9 +15,9 @@
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
             <div class="container d-flex justify-content-between">
                 <a class="navbar-brand" href="/">Трекер задач</a>
-                <?php if ($isAdmin): ?>
+                <?php if ($isAdmin) : ?>
                     <a href="/logout" class="d-flex align-right btn btn-light">Выйти</a>
-                <?php else: ?>
+                <?php else : ?>
                     <a href="/login" class="d-flex align-right btn btn-light">Войти</a>
                 <?php endif; ?>
             </div>

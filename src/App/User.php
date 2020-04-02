@@ -4,28 +4,17 @@ namespace App;
 
 class User
 {
-    private $role;
-    private $username;
+    public const KEY = 'username';
     
-    public function __construct($username, $role = 'guest')
+    private $name;
+    
+    public function __construct(string $name)
     {
-        if (!is_string($username)) {
-            throw new InvalidArgumentException('Username should be a string');
-        }
-        if (!is_string($role)) {
-            throw new InvalidArgumentException('Role should be a string');
-        }
-        $this->username = $username;
-        $this->role = $role;
+        $this->name = $name;
     }
     
-    public function getRole()
+    public function getName()
     {
-        return $this->role;
-    }
-    
-    public function getUsername()
-    {
-        return $this->username;
+        return $this->name;
     }
 }

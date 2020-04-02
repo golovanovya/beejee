@@ -19,6 +19,46 @@ $container['adminUsers'] = [
 $container['entityPath'] = [__DIR__."/../src/App/Entity"];
 $container['viewsPath'] = __DIR__.'/../src/App/Views';
 $container['assetsPath'] = __DIR__.'/../public/';
+$container['rules'] = [
+    'login' => [
+        'login' => [
+            new \Symfony\Component\Validator\Constraints\NotBlank([]),
+        ],
+        'password' => [
+            new \Symfony\Component\Validator\Constraints\NotBlank([]),
+        ],
+    ],
+    'job' => [
+        'name' => [
+            new \Symfony\Component\Validator\Constraints\Length([
+                'max' => 50,
+                'minMessage' => 'Значение не может быть меньше, чем {{ limit }} символов',
+                'maxMessage' => 'Значение не может быть больше, чем {{ limit }} символов',
+                ]),
+            new \Symfony\Component\Validator\Constraints\NotBlank([
+                'message' => 'Поле не может быть пустым.',
+                ]),
+        ],
+        'email' => [
+            new Symfony\Component\Validator\Constraints\Email([
+                'message' => 'Email "{{ value }}" не соответствует шаблону.',
+                ]),
+            new \Symfony\Component\Validator\Constraints\NotBlank([
+                'message' => 'Поле не может быть пустым.',
+                ]),
+        ],
+        'content' => [
+            new \Symfony\Component\Validator\Constraints\Length([
+                'max' => 255,
+                'minMessage' => 'Значение не может быть меньше, чем {{ limit }} символов',
+                'maxMessage' => 'Значение не может быть больше, чем {{ limit }} символов',
+                ]),
+            new \Symfony\Component\Validator\Constraints\NotBlank([
+                'message' => 'Поле не может быть пустым.',
+                ]),
+        ],
+    ]
+];
 
 // ===== SERVICES =========
 $container['annotationConfig'] = function($c) {
@@ -43,7 +83,7 @@ $container[\PDO::class] = function($c) {
     );
     return $pdo;
 };
-$container['templateRenderer'] = function($c) {
+$container['templateRenderer'] = function ($c) {
     $asset = new League\Plates\Extension\Asset($c['assetsPath']);
     $template = new League\Plates\Engine($c['viewsPath']);
     $template->loadExtension($asset);
@@ -51,26 +91,35 @@ $container['templateRenderer'] = function($c) {
 };
 
 // ===== APP =========
-$container[App\Controller\SiteController::class] = function ($c) {
+$container[App\Controller\LoginForm::class] = function ($c) {
     $templateRenderer = $c['templateRenderer'];
-    $authManager = $c['authManager'];
-    $adminUsers = $c['adminUsers'];
-    return new App\Controller\SiteController($templateRenderer, $authManager, $adminUsers);
+    return new App\Controller\LoginForm($templateRenderer);
 };
-$container[App\Controller\JobController::class] = function ($c) {
+$container[\App\Controller\Login::class] = function ($c) {
+    $userManager = $c['userManager'];
+    return new \App\Controller\Login($userManager);
+};
+$container[App\Controller\JobList::class] = function ($c) {
     $templateRenderer = $c['templateRenderer'];
     $jobRepository = $c['jobRepository'];
-    $authManager = $c['authManager'];
-    return new App\Controller\JobController(
-        $templateRenderer,
-        $jobRepository,
-        $authManager
-    );
+    return new App\Controller\JobList($templateRenderer, $jobRepository);
 };
-$container['jobRepository'] = function($c) {
+$container[App\Controller\JobCreateForm::class] = function ($c) {
+    return new App\Controller\JobCreateForm($c['templateRenderer'], $c['jobRepository']);
+};
+$container[App\Controller\JobUpdateForm::class] = function ($c) {
+    return new App\Controller\JobUpdateForm($c['templateRenderer'], $c['jobRepository']);
+};
+$container[\App\Controller\JobCreate::class] = function ($c) {
+    return new App\Controller\JobCreate($c['templateRenderer'], $c['jobRepository']);
+};
+$container[\App\Controller\JobUpdate::class] = function ($c) {
+    return new App\Controller\JobUpdate($c['templateRenderer'], $c['jobRepository']);
+};
+$container['jobRepository'] = function ($c) {
     return new App\Models\JobRepository($c[\PDO::class], $c['em']);
 };
 
-$container['authManager'] = new \App\AuthManager();
+$container['userManager'] = new \App\UserManager();
 
 return new \Pimple\Psr11\Container($container);

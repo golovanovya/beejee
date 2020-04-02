@@ -1,12 +1,5 @@
-<?php 
+<?php
 $this->layout('layout/main', ['isAdmin' => $isAdmin]);
-
-$hasErors = function($model) {
-    if ($model->isLoad && !$model->isValid) {
-        return true;
-    }
-    return false;
-};
 ?>
 
 <div class="text-center">
@@ -26,7 +19,7 @@ $hasErors = function($model) {
                class="form-control" 
                placeholder="Пароль" 
                required="">
-        <?php if ($hasErors($model)): ?>
+        <?php if (!empty($errors)) : ?>
             <div class="text-danger">
                 Пара логин/пароль некорректна! Попробуйте снова.
             </div>

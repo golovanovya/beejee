@@ -29,7 +29,7 @@ class JobRepository
         }
         $stmt = $this->pdo->prepare('
             SELECT *
-            FROM jobs '.$orderBy.' LIMIT :limit OFFSET :offset
+            FROM jobs ' . $orderBy . ' LIMIT :limit OFFSET :offset
         ');
 
         $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
@@ -40,6 +40,10 @@ class JobRepository
         return array_map([$this, 'hydrate'], $stmt->fetchAll());
     }
 
+    /**
+     * @param int $id
+     * @return \App\Entity\Job
+     */
     public function find(int $id)
     {
         $job = $this->em->find(\App\Entity\Job::class, $id);

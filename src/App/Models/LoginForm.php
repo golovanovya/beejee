@@ -10,7 +10,7 @@ class LoginForm
     public $isValid = false;
     public $isLoad = false;
 
-    public function __construct($params = [])
+    public function __construct(array $params = [])
     {
         foreach ($params as $attribute => $value) {
             if (property_exists($this, $attribute)) {
@@ -32,15 +32,5 @@ class LoginForm
             }
         }
         return $this->isLoad;
-    }
-    
-    public function validate($users)
-    {
-        foreach ($users as $user => $password) {
-            if ($this->login === $user && $this->password == $password) {
-                $this->isValid = true;
-            }
-        }
-        return $this->isValid;
     }
 }
