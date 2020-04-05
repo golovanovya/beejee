@@ -1,5 +1,6 @@
 <?php
 /* @var $pager \App\Models\Paginator */
+/* @var $notice \App\Notice */
 
 $reverseSort = function ($attribute) use ($direction) {
     if ($direction === SORT_ASC) {
@@ -24,23 +25,6 @@ $getSortUrl = function ($attribute, bool $reverse = true, bool $pagination = tru
     return sprintf('/sort/%s%s', $name, $pagination);
 };
 ?>
-
-<?php $this->layout('layout/main', ['isAdmin' => $isAdmin]) ?>
-
-<?php $this->start('flash') ?>
-<?php if ($flashMsg) : ?>
-    <?php if ($flashMsg['success']) : ?>
-        <div class="alert alert-success" role="alert">
-            <?= $flashMsg['success'] ?>
-        </div>
-    <?php endif; ?>
-    <?php if ($flashMsg['fail']) : ?>
-        <div class="alert alert-danger" role="alert">
-            <?= $flashMsg['fail'] ?>
-        </div>
-    <?php endif; ?>
-<?php endif; ?>
-<?php $this->end() ?>
     
 <div class="d-flex p-2">
     <a href="/create" class="btn btn-primary js-form-modal">Добавить</a>
@@ -65,7 +49,7 @@ $getSortUrl = function ($attribute, bool $reverse = true, bool $pagination = tru
             <td scope="col"><?= $job['status'] ? '<img src="/img/check.svg" alt="Выполнена">' : '' ?></td>
             <td scope="col"><?= $job['edited_by_admin'] ? '<img src="/img/edit-3.svg" alt="Редактировалось администратором">' : '' ?></td>
             <td scope="col">
-                <?php if($isAdmin) : ?>
+                <?php if ($isAdmin) : ?>
                 <a href="/update/<?=$job['id']?>" title="Редактировать"><img src="/img/edit.svg"></a>
                 <?php endif; ?>
             </td>

@@ -1,6 +1,4 @@
 <?php
-$this->layout('layout/main', ['isAdmin' => $isAdmin]);
-
 $hasErrors = function (string $attribute) use ($errors) {
     return isset($errors[$attribute]);
 };
@@ -26,13 +24,14 @@ $getErrors = function (string $attribute) use ($errors, $hasErrors) {
 ?>
 
 <form method="POST" action="<?= $id ? "/update/$id" : '/create' ?>">
+    <input type="hidden" name="__csrf" value="<?= $this->e($csrf) ?>">
     <div class="form-group row">
         <label for="name" class="col-sm-3 col-form-label text-right">Имя:</label>
         <div class="col-sm-9">
             <input type="text" 
                 class="form-control <?= $getValidCssClass('name') ?>" 
                 name="name" 
-                value="<?= $model->name ?>">
+                value="<?= $this->e($model->name) ?>">
             <?= $getErrors('name') ?>
         </div>
     </div>
@@ -42,7 +41,7 @@ $getErrors = function (string $attribute) use ($errors, $hasErrors) {
             <input type="text" 
                 class="form-control <?= $getValidCssClass('email') ?>" 
                 name="email"
-                value="<?= $model->email ?>">
+                value="<?= $this->e($model->email) ?>">
             <?= $getErrors('email') ?>
         </div>
     </div>
@@ -50,7 +49,7 @@ $getErrors = function (string $attribute) use ($errors, $hasErrors) {
         <label for="content" class="col-sm-3 col-form-label text-right">Текст задачи:</label>
         <div class="col-sm-9">
             <textarea class="form-control <?= $getValidCssClass('content') ?>" 
-                name="content"><?= $model->content ?></textarea>
+                name="content"><?= $this->e($model->content) ?></textarea>
             <?= $getErrors('content') ?>
         </div>
     </div>

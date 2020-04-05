@@ -50,7 +50,10 @@ $router->post('/update/{id:number}', \App\Controller\JobUpdate::class)
     ->middleware(new \App\Middleware\Validate($container->get('rules')['job']))
     ->middleware(new \App\Middleware\HandleValidationErrors());
 $router->middleware(new Middlewares\AuraSession())
-    ->middleware(new App\Middleware\SessionAuthenticate($container->get('userManager')));
+    ->middleware(new App\Middleware\SessionAuthenticate($container->get('userManager')))
+    ->middleware(new App\Middleware\ValidateCsrf())
+    ->middleware(new App\Middleware\ExtractFlashNotice())
+    ->middleware(new \App\Middleware\GenerateCsrf());
 
 try {
     $response = $router->dispatch($request);

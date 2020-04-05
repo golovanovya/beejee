@@ -1,4 +1,7 @@
-<?php ?>
+<?php
+/* @var $this \League\Plates\Template\Template */
+/* @var $notice \App\Notice */
+?>
 
 <!DOCTYPE html>
 <html>
@@ -23,7 +26,22 @@
             </div>
         </nav>
         <main role="main" class="container">
-            <?= $this->section('flash') ?>
+
+            <?php if ($notice !== null) : ?>
+                <?php
+                $class = $notice->getLevel();
+                switch ($class) {
+                    case \App\Notice::ERROR:
+                        $class = 'danger';
+                        break;
+                    default:
+                        break;
+                }
+                ?>
+                <div class="alert alert-<?= $this->e($class) ?>" role="alert">
+                    <?= $notice->getMessage() ?>
+                </div>
+            <?php endif; ?>
             <div class="">
                 <?= $this->section('content') ?>
             </div>

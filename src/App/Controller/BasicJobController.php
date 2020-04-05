@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Models\JobForm;
 use App\Models\JobRepository;
 use League\Plates\Engine;
+use League\Route\Http\Exception\NotFoundException;
 
 abstract class BasicJobController extends BasicRenderController
 {
@@ -28,7 +30,7 @@ abstract class BasicJobController extends BasicRenderController
     {
         $job = $this->jobRepository->find($id);
         if (!$job) {
-            throw new NotFoundException("Задача не найдена");
+            throw new NotFoundException("Job not found");
         }
         return $job;
     }

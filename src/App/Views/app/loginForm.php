@@ -1,9 +1,10 @@
 <?php
-$this->layout('layout/main', ['isAdmin' => $isAdmin]);
+/* @var $model \App\Models\LoginForm */
 ?>
 
 <div class="text-center">
     <form method="POST" action="/login" class="form-signin">
+        <input type="hidden" name="__csrf" value="<?= $this->e($csrf) ?>">
         <h1 class="h5 mb-3 font-weight-normal">Пожайлуйста авторизуйтесь</h1>
         <label for="login" class="sr-only">Логин</label>
         <input type="text" 
@@ -12,13 +13,14 @@ $this->layout('layout/main', ['isAdmin' => $isAdmin]);
                placeholder="Логин" 
                required="" 
                autofocus=""
-               value="<?= $model->login ?>">
+               value="<?= $this->e($model->login) ?>">
         <label for="password" class="sr-only">Пароль</label>
         <input type="password" 
                name="password" 
                class="form-control" 
-               placeholder="Пароль" 
-               required="">
+               placeholder="Пароль"
+               required=""
+               value="<?= $this->e($model->password) ?>">
         <?php if (!empty($errors)) : ?>
             <div class="text-danger">
                 Пара логин/пароль некорректна! Попробуйте снова.
