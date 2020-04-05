@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\Models\Pagination;
+use App\Models\Paginator;
+use League\Route\Http\Exception\NotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -12,27 +13,34 @@ class JobList extends BasicJobController
     
     public function action(ServerRequestInterface $request, array $args = []): ResponseInterface
     {
-        $q = $request->getQueryParams();
-        $page = $q['page'] ?? 0;
-        $order = $q['sort'] ?? '';
+        $page = isset($args['page']) ? intval($args['page']) : 1;
+        $sort = $args['sort'] ?? '';
+        $direction = isset($args['direction']) && $args['direction'] === '-' ?
+            SORT_DESC :
+            SORT_ASC;
         
-        $pager = new Pagination(
+        $paginator = new Paginator(
             $this->jobRepository->countAll(),
-            intval($page) ?: 1,
-            self::PER_PAGE,
-            $q
+            $page,
+            self::PER_PAGE
         );
         
+        if ($paginator->getPagesCount() < $page || $page < 1) {
+            throw new NotFoundException("Page with this number not found!");
+        }
+        
         $jobs = $this->jobRepository->all(
-            $pager->getOffset(),
-            $pager->getLimit(),
-            $order
+            $sort,
+            $direction,
+            $paginator->getLimit(),
+            $paginator->getOffset()
         );
         
         return $this->render('app/index', [
             'jobs' => $jobs,
-            'pager' => $pager,
-            'q' => $q,
+            'pager' => $paginator,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 }

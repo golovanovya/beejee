@@ -2,20 +2,17 @@
 
 namespace App\Models;
 
-class Pagination
+class Paginator
 {
     private $totalCount;
     private $page;
-    private $perPage;
-    private $args;
+    private $limit;
 
-    public function __construct(int $totalCount, int $page, int $perPage, array $args)
+    public function __construct(int $totalCount, int $page, int $perPage)
     {
         $this->totalCount = $totalCount;
         $this->page = $page;
-        $this->perPage = $perPage;
-        unset($args['page']);
-        $this->args = $args;
+        $this->limit = $perPage;
     }
 
     public function getTotalCount(): int
@@ -30,26 +27,21 @@ class Pagination
 
     public function getPagesCount(): int
     {
-        return ceil($this->totalCount / $this->perPage);
+        return ceil($this->totalCount / $this->limit);
     }
 
     public function getPerPage(): int
     {
-        return $this->perPage;
+        return $this->limit;
     }
 
     public function getLimit(): int
     {
-        return $this->perPage;
+        return $this->limit;
     }
 
     public function getOffset(): int
     {
-        return ($this->page - 1) * $this->perPage;
-    }
-    
-    public function getArgs()
-    {
-        return $this->args;
+        return ($this->page - 1) * $this->limit;
     }
 }

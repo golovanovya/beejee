@@ -1,49 +1,40 @@
 <?php
-$sort = $q['sort'] ?? '';
-$reverseSort = function ($attribute) {
-    if (substr($attribute, 0, 1) == '-') {
-        return substr($attribute, 1);
+/* @var $pager \App\Models\Paginator */
+
+$reverseSort = function ($attribute) use ($direction) {
+    if ($direction === SORT_ASC) {
+        return "$attribute-";
     } else {
-        return '-'.$attribute;
+        return $attribute;
     }
 };
-$getIcon = function ($getAttr, $targetAttr) {
-    $dir = null;
-    $attr = null;
-    if (substr($getAttr, 0, 1) == '-') {
-        $attr = substr($getAttr, 1); // DESC, вверх
-        $dir = SORT_DESC;
-    } else {
-        $attr = $getAttr; // ASC, вниз
-        $dir = SORT_ASC;
-    }
-    if ($attr == $targetAttr) {
-        if ($dir == SORT_ASC) {
+$getIcon = function ($attribute) use ($sort, $direction) {
+    if ($attribute === $sort) {
+        if ($direction === SORT_ASC) {
             return '<img src="/img/arrow-down.svg">';
-        }
-        if ($dir == SORT_DESC) {
+        } elseif ($direction === SORT_DESC) {
             return '<img src="/img/arrow-up.svg">';
         }
     }
     return '';
 };
-$getSortUrl = function ($getAttr, $targetAttr) use ($reverseSort, $q) {
-    $name = ($getAttr === $targetAttr) ? $reverseSort($getAttr) : $targetAttr;
-    $args = ['sort' => $name];
-    return sprintf('/?%s', http_build_query(array_merge($q, $args)));
+$getSortUrl = function ($attribute, bool $reverse = true, bool $pagination = true) use ($sort, $reverseSort, $pager) {
+    $name = $sort === $attribute && $reverse ? $reverseSort($sort) : $attribute;
+    $pagination = $pager->getPage() === 1 || !$pagination ? '' : '/page/' . $pager->getPage();
+    return sprintf('/sort/%s%s', $name, $pagination);
 };
 ?>
 
 <?php $this->layout('layout/main', ['isAdmin' => $isAdmin]) ?>
 
 <?php $this->start('flash') ?>
-<?php if ($flashMsg): ?>
-    <?php if ($flashMsg['success']): ?>
+<?php if ($flashMsg) : ?>
+    <?php if ($flashMsg['success']) : ?>
         <div class="alert alert-success" role="alert">
             <?= $flashMsg['success'] ?>
         </div>
     <?php endif; ?>
-    <?php if ($flashMsg['fail']): ?>
+    <?php if ($flashMsg['fail']) : ?>
         <div class="alert alert-danger" role="alert">
             <?= $flashMsg['fail'] ?>
         </div>
@@ -57,16 +48,16 @@ $getSortUrl = function ($getAttr, $targetAttr) use ($reverseSort, $q) {
 <table class="table">
     <thead>
         <tr>
-            <th scope="col" width="20%"><a href="<?= $getSortUrl($sort, 'name') ?>">имя пользователя <?= $getIcon($sort, 'name') ?></a></th>
-            <th scope="col" width="20%"><a href="<?= $getSortUrl($sort, 'email') ?>">e-mail <?= $getIcon($sort, 'email') ?></th>
+            <th scope="col" width="20%"><a href="<?= $getSortUrl('name') ?>">имя пользователя <?= $getIcon('name') ?></a></th>
+            <th scope="col" width="20%"><a href="<?= $getSortUrl('email') ?>">e-mail <?= $getIcon('email') ?></th>
             <th scope="col" width="40%">текст задачи</a></th>
-            <th scope="col" width="10%"><a href="<?= $getSortUrl($sort, 'status') ?>">статус <?= $getIcon($sort, 'status') ?></a></th>
+            <th scope="col" width="10%"><a href="<?= $getSortUrl('status') ?>">статус <?= $getIcon('status') ?></a></th>
             <th scope="col" width="5%"></th>
             <th scope="col" width="5%"></th>
         </tr>
     </thead>
     <tbody>
-    <?php foreach ($jobs as $i => $job): ?>
+    <?php foreach ($jobs as $i => $job) : ?>
         <tr>
             <td scope="col"><?= $this->e($job['name']) ?></td>
             <td scope="col"><?= $this->e($job['email']) ?></td>
@@ -74,7 +65,7 @@ $getSortUrl = function ($getAttr, $targetAttr) use ($reverseSort, $q) {
             <td scope="col"><?= $job['status'] ? '<img src="/img/check.svg" alt="Выполнена">' : '' ?></td>
             <td scope="col"><?= $job['edited_by_admin'] ? '<img src="/img/edit-3.svg" alt="Редактировалось администратором">' : '' ?></td>
             <td scope="col">
-                <?php if($isAdmin): ?>
+                <?php if($isAdmin) : ?>
                 <a href="/update/<?=$job['id']?>" title="Редактировать"><img src="/img/edit.svg"></a>
                 <?php endif; ?>
             </td>
@@ -83,4 +74,13 @@ $getSortUrl = function ($getAttr, $targetAttr) use ($reverseSort, $q) {
     </tbody>
 </table>
 
-<?php $this->insert('widget/pager', ['pager' => $pager, 'main_route' => '/', 'route' => '/']) ?>
+<?php $this->insert(
+    'widget/pager',
+    [
+        'pager' => $pager,
+        'main_route' => '/',
+        'route' => empty($sort) ?
+            '/page/%s' :
+            $getSortUrl($sort, false, false) . '/page/%s',
+    ]
+); ?>

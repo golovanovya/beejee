@@ -10,17 +10,19 @@ $whoops->register();
 
 $container = require_once __DIR__ . '/../config/container.php';
 
-$request = Laminas\Diactoros\ServerRequestFactory::fromGlobals(
-    $_SERVER,
-    $_GET,
-    $_POST,
-    $_COOKIE,
-    $_FILES,
-);
+$request = Laminas\Diactoros\ServerRequestFactory::fromGlobals();
 
 $strategy = (new League\Route\Strategy\ApplicationStrategy())->setContainer($container);
+
+/* @var $router League\Route\Router */
 $router = (new League\Route\Router())->setStrategy($strategy);
+$router->addPatternMatcher('word', '\w+');
+$router->addPatternMatcher('sort_chars', '[\-\+]{0,1}');
 $router->get('/', App\Controller\JobList::class);
+$router->get('/sort/{sort:word}{direction:sort_chars}', App\Controller\JobList::class);
+$router->get('/sort/{sort:word}{direction:sort_chars}/page/{page:number}', App\Controller\JobList::class);
+$router->get('/page/{page:number}', App\Controller\JobList::class);
+
 $router->get('/login', App\Controller\LoginForm::class)
     ->middleware(new App\Middleware\ExtractFlashErrors());
 $router->post('/login', \App\Controller\Login::class)
@@ -55,7 +57,7 @@ try {
     $response = $router->dispatch($request);
 } catch (\League\Route\Http\Exception\NotFoundException $e) {
     $response = new \Laminas\Diactoros\Response();
-    $response->getBody()->write($container->get(League\Plates\Engine::class)->render('app/404', ['e' => $e]));
+    $response->getBody()->write($container->get('templateRenderer')->render('app/404', ['e' => $e]));
     $response->withStatus(404);
 } catch (League\Route\Http\Exception\UnauthorizedException $e) {
     $response = new \Laminas\Diactoros\Response\RedirectResponse('/login');
