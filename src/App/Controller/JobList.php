@@ -13,6 +13,7 @@ class JobList extends BasicJobController
     
     public function action(ServerRequestInterface $request, array $args = []): ResponseInterface
     {
+        $request->getParsedBody();
         $page = isset($args['page']) ? intval($args['page']) : 1;
         $sort = $args['sort'] ?? '';
         $direction = isset($args['direction']) && $args['direction'] === '-' ?

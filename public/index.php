@@ -7,7 +7,6 @@ $whoops = new \Whoops\Run();
 $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
 $whoops->register();
 
-
 $container = require_once __DIR__ . '/../config/container.php';
 
 $request = Laminas\Diactoros\ServerRequestFactory::fromGlobals();

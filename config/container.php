@@ -1,67 +1,28 @@
 <?php
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/../');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
-$container = new \Pimple\Container;
+$container = new \Pimple\Container();
 
 // ===== PARAMS =========
 $container['dbParams'] = [
-    'driver'   => 'pdo_mysql',
-    'host'     => getenv('DB_HOST'),
-    'dbname'   => getenv('DB_NAME'),
-    'user'     => getenv('DB_USER'),
+    'driver' => 'pdo_mysql',
+    'host' => getenv('DB_HOST'),
+    'dbname' => getenv('DB_NAME'),
+    'user' => getenv('DB_USER'),
     'password' => getenv('DB_PASSWORD'),
 ];
 $container['adminUsers'] = [
     getenv('ADMIN_LOGIN') => getenv('ADMIN_PASSWORD')
 ];
-$container['entityPath'] = [__DIR__."/../src/App/Entity"];
-$container['viewsPath'] = __DIR__.'/../src/App/Views';
-$container['assetsPath'] = __DIR__.'/../public/';
-$container['rules'] = [
-    'login' => [
-        'login' => [
-            new \Symfony\Component\Validator\Constraints\NotBlank([]),
-        ],
-        'password' => [
-            new \Symfony\Component\Validator\Constraints\NotBlank([]),
-        ],
-    ],
-    'job' => [
-        'name' => [
-            new \Symfony\Component\Validator\Constraints\Length([
-                'max' => 50,
-                'minMessage' => 'Значение не может быть меньше, чем {{ limit }} символов',
-                'maxMessage' => 'Значение не может быть больше, чем {{ limit }} символов',
-                ]),
-            new \Symfony\Component\Validator\Constraints\NotBlank([
-                'message' => 'Поле не может быть пустым.',
-                ]),
-        ],
-        'email' => [
-            new Symfony\Component\Validator\Constraints\Email([
-                'message' => 'Email "{{ value }}" не соответствует шаблону.',
-                ]),
-            new \Symfony\Component\Validator\Constraints\NotBlank([
-                'message' => 'Поле не может быть пустым.',
-                ]),
-        ],
-        'content' => [
-            new \Symfony\Component\Validator\Constraints\Length([
-                'max' => 255,
-                'minMessage' => 'Значение не может быть меньше, чем {{ limit }} символов',
-                'maxMessage' => 'Значение не может быть больше, чем {{ limit }} символов',
-                ]),
-            new \Symfony\Component\Validator\Constraints\NotBlank([
-                'message' => 'Поле не может быть пустым.',
-                ]),
-        ],
-    ]
-];
+$container['entityPath'] = [__DIR__ . "/../src/App/Entity"];
+$container['viewsPath'] = __DIR__ . '/../src/App/Views';
+$container['assetsPath'] = __DIR__ . '/../public/';
+$container['rules'] = require_once __DIR__ . '/validation-rules.php';
 
 // ===== SERVICES =========
-$container['annotationConfig'] = function($c) {
+$container['annotationConfig'] = function ($c) {
     $isDevMode = true;
     $proxyDir = null;
     $cache = null;
@@ -69,16 +30,16 @@ $container['annotationConfig'] = function($c) {
     $paths = $c['entityPath'];
     return Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, $proxyDir, $cache, $useSimpleAnnotationReader);
 };
-$container['em'] = function($c) {
+$container['em'] = function ($c) {
     return Doctrine\ORM\EntityManager::create($c['dbParams'], $c['annotationConfig']);
 };
-$container[\PDO::class] = function($c) {
+$container[\PDO::class] = function ($c) {
     $pdo = new \PDO(
         sprintf('mysql:host=%s;dbname=%s', $c['dbParams']['host'], $c['dbParams']['dbname']),
         $c['dbParams']['user'],
         $c['dbParams']['password'],
         [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ]
     );
     return $pdo;

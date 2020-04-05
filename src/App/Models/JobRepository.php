@@ -21,7 +21,7 @@ class JobRepository
     public function all(string $orderby, int $direction = SORT_ASC, int $limit = 10, $offset = 0): array
     {
         $direction = $direction === SORT_ASC ? 'ASC' : 'DESC';
-        $orderby = strtr($this->pdo->quote($orderby), "'", "`");
+        $orderby = !empty($orderby) ? strtr($this->pdo->quote($orderby), "'", "`") : 'id';
         $stmt = $this->pdo->prepare("
             SELECT *
             FROM jobs ORDER BY $orderby $direction LIMIT :limit OFFSET :offset
