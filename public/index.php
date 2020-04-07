@@ -11,11 +11,10 @@ $container = require_once __DIR__ . '/../config/container.php';
 
 $request = Laminas\Diactoros\ServerRequestFactory::fromGlobals();
 
-$strategy = (new League\Route\Strategy\ApplicationStrategy())->setContainer($container);
+$strategy = (new App\Route\ApplicationStrategy())->setContainer($container);
 
 /* @var $router League\Route\Router */
-$router = (new League\Route\Router())->setStrategy($strategy);
-$router->addPatternMatcher('word', '\w+');
+$router = (new App\Route\Router())->setStrategy($strategy);
 $router->addPatternMatcher('sort_chars', '[\-\+]{0,1}');
 $router->get('/', App\Controller\JobList::class);
 $router->get('/sort/{sort:word}{direction:sort_chars}', App\Controller\JobList::class);
@@ -55,21 +54,6 @@ $router->middleware(new Middlewares\AuraSession())
     ->middleware(new App\Middleware\ExtractFlashNotice())
     ->middleware(new \App\Middleware\GenerateCsrf());
 
-try {
-    $response = $router->dispatch($request);
-} catch (\League\Route\Http\Exception\NotFoundException $e) {
-    $response = new \Laminas\Diactoros\Response();
-    $response->getBody()->write($container->get('templateRenderer')->render('app/404', ['e' => $e]));
-    $response->withStatus(404);
-} catch (League\Route\Http\Exception\UnauthorizedException $e) {
-    $response = new \Laminas\Diactoros\Response\RedirectResponse('/login');
-} catch (\Exception $e) {
-    if ((bool) getenv('DEBUG') == true) {
-        throw $e;
-    }
-    $response = new \Laminas\Diactoros\Response();
-    $response->getBody()->write($container->get(League\Plates\Engine::class)->render('app/error', ['e' => $e]));
-    $response->withStatus(500);
-}
+$response = $router->dispatch($request);
 
 (new Laminas\HttpHandlerRunner\Emitter\SapiEmitter())->emit($response);

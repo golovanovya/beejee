@@ -20,6 +20,7 @@ $container['entityPath'] = [__DIR__ . "/../src/App/Entity"];
 $container['viewsPath'] = __DIR__ . '/../src/App/Views';
 $container['assetsPath'] = __DIR__ . '/../public/';
 $container['rules'] = require_once __DIR__ . '/validation-rules.php';
+$container['debug'] = boolval(getenv('DEBUG'));
 
 // ===== SERVICES =========
 $container['annotationConfig'] = function ($c) {
