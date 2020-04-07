@@ -11,8 +11,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class Authorize implements MiddlewareInterface
 {
-    private $allowed;
-    private $userAttribute = 'user';
+    protected $allowed;
+    protected $userAttribute = 'user';
+    protected $loginRoute = '/login';
     
     /**
      * Allowed role
@@ -27,7 +28,8 @@ class Authorize implements MiddlewareInterface
     {
         $user = $request->getAttribute($this->userAttribute);
         if ($user === null && $this->allowed !== '*') {
-            throw new UnauthorizedException();
+            return new \Laminas\Diactoros\Response\RedirectResponse($this->loginRoute);
+//            throw new UnauthorizedException('Access denied!');
         }
         /* elseif ($user !== null && $this->allowed !== $user->getRole() && $this->allowed !== '*') {
             throw new ForbiddenException();

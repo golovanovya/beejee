@@ -3,7 +3,7 @@
 ?>
 
 <div class="text-center">
-    <form method="POST" action="/login" class="form-signin">
+    <form method="POST" action="<?= $loginUri ?>" class="form-signin">
         <input type="hidden" name="__csrf" value="<?= $this->e($csrf) ?>">
         <h1 class="h5 mb-3 font-weight-normal">Пожайлуйста авторизуйтесь</h1>
         <label for="login" class="sr-only">Логин</label>
