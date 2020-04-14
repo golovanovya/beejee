@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Models\JobForm;
 use App\Models\JobRepository;
-use League\Plates\Engine;
+use App\RenderableInterface;
 use League\Route\Http\Exception\NotFoundException;
 
 abstract class BasicJobController extends BasicRenderController
@@ -14,7 +14,7 @@ abstract class BasicJobController extends BasicRenderController
      */
     protected $jobRepository;
     
-    public function __construct(Engine $templateRenderer, JobRepository $jobRepository)
+    public function __construct(RenderableInterface $templateRenderer, JobRepository $jobRepository)
     {
         parent::__construct($templateRenderer);
         $this->jobRepository = $jobRepository;

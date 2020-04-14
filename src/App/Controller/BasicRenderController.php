@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 abstract class BasicRenderController implements RendarableControllerInterface
 {
     /**
-     * @var Engine
+     * @var \App\TemplateRenderer
      */
     private $templateRenderer;
     /**
@@ -29,7 +29,7 @@ abstract class BasicRenderController implements RendarableControllerInterface
 
     protected $layout = 'layout/main';
     
-    public function __construct(Engine $templateRenderer)
+    public function __construct(\App\RenderableInterface $templateRenderer)
     {
         $this->templateRenderer = $templateRenderer;
     }
@@ -42,18 +42,20 @@ abstract class BasicRenderController implements RendarableControllerInterface
         return $this->action($request, $args);
     }
     
-    public function render(string $view = 'app/index', array $data = array()): ResponseInterface
+    public function render(string $view = 'app/index', array $data = []): string
     {
         $data['isAdmin'] = $this->user !== null;
         $data['notice'] = $this->notice;
         $data['csrf'] = $this->csrf;
-        $template = $this->templateRenderer->make($view);
-        $template->layout($this->layout, $data);
-        $response = new Response();
+        $this->templateRenderer->layout($this->layout, $data);
+        return $this->templateRenderer->render($view, $data);
+    }
+    
+    public static function buildResponse(string $string): ResponseInterface
+    {
+        $response = new \Laminas\Diactoros\Response();
         $response->getBody()
-            ->write(
-                $template->render($data)
-            );
+            ->write($string);
         return $response;
     }
 }

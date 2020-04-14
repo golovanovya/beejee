@@ -23,7 +23,7 @@ $getErrors = function (string $attribute) use ($errors, $hasErrors) {
 }
 ?>
 
-<form method="POST" action="<?= $id ? "/update/$id" : '/create' ?>">
+<form method="POST" action="<?= isset($id) ? "/update/$id" : '/create' ?>">
     <input type="hidden" name="__csrf" value="<?= $this->e($csrf) ?>">
     <div class="form-group row">
         <label for="name" class="col-sm-3 col-form-label text-right">Имя:</label>
@@ -71,7 +71,7 @@ $getErrors = function (string $attribute) use ($errors, $hasErrors) {
     <div class="form-group row">
         <div class="col-sm-3 col-form-label text-right"></div>
         <div class="col-sm-9">
-            <button type="submit" class="btn btn-primary"><?= (!$id ? 'Добавить' : 'Сохранить') ?></button>
+            <button type="submit" class="btn btn-primary"><?= (!isset($id) ? 'Добавить' : 'Сохранить') ?></button>
         </div>
     </div>
 </form>

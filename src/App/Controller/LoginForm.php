@@ -21,10 +21,10 @@ class LoginForm extends BasicRenderController
         } elseif ($request->hasHeader('referer') && $referer->getPath() !== $loginUri->getPath()) {
             $loginUri = $loginUri->withQuery('redirect=' . rawurldecode($referer));
         }
-        return $this->render('app/loginForm', [
+        return static::buildResponse($this->render('app/loginForm', [
             'model' => $model,
             'errors' => $request->getAttribute('errors'),
             'loginUri' => $loginUri,
-        ]);
+        ]));
     }
 }

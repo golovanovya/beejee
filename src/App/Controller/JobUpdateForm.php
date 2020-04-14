@@ -15,10 +15,10 @@ class JobUpdateForm extends BasicJobController
         $job = $this->getModel($id);
         $formModel = new Form();
         $formModel->load($oldData ?? $job->getDto());
-        return $this->render('app/jobForm', [
+        return static::buildResponse($this->render('app/jobForm', [
             'model' => $formModel,
             'errors' => $request->getAttribute('errors'),
             'id' => $id,
-        ]);
+        ]));
     }
 }

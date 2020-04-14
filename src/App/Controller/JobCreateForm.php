@@ -15,9 +15,9 @@ class JobCreateForm extends BasicJobController
         if ($oldData !== null) {
             $model->load($oldData);
         }
-        return $this->render('app/jobForm', [
+        return static::buildResponse($this->render('app/jobForm', [
             'model' => $model,
             'errors' => $request->getAttribute('errors'),
-        ]);
+        ]));
     }
 }

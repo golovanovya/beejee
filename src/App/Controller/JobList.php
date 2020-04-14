@@ -35,12 +35,11 @@ class JobList extends BasicJobController
             $paginator->getLimit(),
             $paginator->getOffset()
         );
-        
-        return $this->render('app/index', [
+        return static::buildResponse($this->render('app/index', [
             'jobs' => $jobs,
             'pager' => $paginator,
             'sort' => $sort,
             'direction' => $direction,
-        ]);
+        ]));
     }
 }

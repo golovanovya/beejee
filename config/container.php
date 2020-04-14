@@ -16,9 +16,12 @@ $container['dbParams'] = [
 $container['adminUsers'] = [
     getenv('ADMIN_LOGIN') => getenv('ADMIN_PASSWORD')
 ];
-$container['entityPath'] = [__DIR__ . "/../src/App/Entity"];
-$container['viewsPath'] = __DIR__ . '/../src/App/Views';
-$container['assetsPath'] = __DIR__ . '/../public/';
+$container['entityPath'] = ['src/App/Entity'];
+$container['engineParams'] = [
+    'viewsPath' => 'src/App/Views',
+    'assetsPath' => 'public/',
+];
+$container['mainLayout'] = 'layout/main';
 $container['rules'] = require_once __DIR__ . '/validation-rules.php';
 $container['debug'] = boolval(getenv('DEBUG'));
 
@@ -40,16 +43,19 @@ $container[\PDO::class] = function ($c) {
         $c['dbParams']['user'],
         $c['dbParams']['password'],
         [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ]
     );
     return $pdo;
 };
-$container['templateRenderer'] = function ($c) {
-    $asset = new League\Plates\Extension\Asset($c['assetsPath']);
-    $template = new League\Plates\Engine($c['viewsPath']);
+$container[League\Plates\Engine::class] = function ($c) {
+    $asset = new League\Plates\Extension\Asset($c['engineParams']['assetsPath']);
+    $template = new League\Plates\Engine($c['engineParams']['viewsPath']);
     $template->loadExtension($asset);
     return $template;
+};
+$container['templateRenderer'] = function ($c) {
+    return new App\TemplateRenderer($c[League\Plates\Engine::class], $c['mainLayout']);
 };
 
 // ===== APP =========
@@ -80,6 +86,59 @@ $container[\App\Controller\JobUpdate::class] = function ($c) {
 };
 $container['jobRepository'] = function ($c) {
     return new App\Models\JobRepository($c[\PDO::class], $c['em']);
+};
+
+$container[App\Route\ApplicationStrategy::class] = function ($c) {
+    return (new App\Route\ApplicationStrategy())
+        ->setContainer(new \Pimple\Psr11\Container($c));
+};
+
+/**
+ * Router configuration
+ */
+$container['router'] = function ($c) {
+    $container = new \Pimple\Psr11\Container($c);
+    /* @var $router League\Route\Router */
+    $router = (new App\Route\Router())->setStrategy($container->get(App\Route\ApplicationStrategy::class));
+    $router->addPatternMatcher('sort_chars', '[\-\+]{0,1}');
+    $router->get('/', App\Controller\JobList::class);
+    $router->get('/sort/{sort:word}{direction:sort_chars}', App\Controller\JobList::class);
+    $router->get('/sort/{sort:word}{direction:sort_chars}/page/{page:number}', App\Controller\JobList::class);
+    $router->get('/page/{page:number}', App\Controller\JobList::class);
+
+    $router->get('/login', App\Controller\LoginForm::class)
+        ->middleware(new App\Middleware\ExtractFlashErrors());
+    $router->post('/login', \App\Controller\Login::class)
+        ->middleware(new \App\Middleware\Validate($container->get('rules')['login']))
+        ->middleware(new \App\Middleware\HandleValidationErrors());
+    $router->get('/logout', function (
+        \Psr\Http\Message\ServerRequestInterface $request
+    ): \Psr\Http\Message\ResponseInterface {
+        /* @var $session Aura\Session\Session */
+        $session = $request->getAttribute('session');
+        if ($session !== null) {
+            $session->destroy();
+        }
+        return new \Laminas\Diactoros\Response\RedirectResponse('/');
+    });
+    $router->get('/create', App\Controller\JobCreateForm::class)
+        ->middleware(new App\Middleware\ExtractFlashErrors());
+    $router->post('/create', \App\Controller\JobCreate::class)
+        ->middleware(new \App\Middleware\Validate($container->get('rules')['job']))
+        ->middleware(new \App\Middleware\HandleValidationErrors());
+    $router->get('/update/{id:number}', App\Controller\JobUpdateForm::class)
+        ->middleware(new App\Middleware\Authorize('@'))
+        ->middleware(new App\Middleware\ExtractFlashErrors());
+    $router->post('/update/{id:number}', \App\Controller\JobUpdate::class)
+        ->middleware(new App\Middleware\Authorize('@'))
+        ->middleware(new \App\Middleware\Validate($container->get('rules')['job']))
+        ->middleware(new \App\Middleware\HandleValidationErrors());
+    $router->middleware(new Middlewares\AuraSession())
+        ->middleware(new App\Middleware\SessionAuthenticate($container->get('userManager')))
+        ->middleware(new App\Middleware\ValidateCsrf())
+        ->middleware(new App\Middleware\ExtractFlashNotice())
+        ->middleware(new \App\Middleware\GenerateCsrf());
+    return $router;
 };
 
 $container['userManager'] = new \App\UserManager();
