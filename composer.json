@@ -15,7 +15,7 @@
     "pimple/pimple": "^3.3"
   },
   "require-dev": {
-    
+    "codeception/codeception": "^4.1"
   },
   "autoload": {
     "psr-4": {
