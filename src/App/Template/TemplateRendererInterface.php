@@ -1,8 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Template;
 
-interface LayoutRendererInterface
+/**
+ * Render view with layout
+ */
+interface TemplateRendererInterface extends RenderableInterface
 {
     /**
      * Set the template's layout

@@ -55,7 +55,7 @@ $container[League\Plates\Engine::class] = function ($c) {
     return $template;
 };
 $container['templateRenderer'] = function ($c) {
-    return new App\TemplateRenderer($c[League\Plates\Engine::class], $c['mainLayout']);
+    return new App\Template\TemplateRenderer($c[League\Plates\Engine::class], $c['mainLayout']);
 };
 
 // ===== APP =========

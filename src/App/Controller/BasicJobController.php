@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Models\JobForm;
 use App\Models\JobRepository;
-use App\RenderableInterface;
+use App\Template\RenderableInterface;
 use League\Route\Http\Exception\NotFoundException;
 
 abstract class BasicJobController extends BasicRenderController

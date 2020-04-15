@@ -1,11 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Template;
 
 /**
- * Adapter for League Engine
+ * Render adapter for League Engine
  */
-class TemplateRenderer implements RenderableInterface, LayoutRendererInterface
+class TemplateRenderer implements TemplateRendererInterface
 {
     private $engine;
     private $layout;

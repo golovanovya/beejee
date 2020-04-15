@@ -5,7 +5,7 @@ namespace App\Controller;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface RendarableControllerInterface extends \App\RenderableInterface
+interface RendarableControllerInterface extends \App\Template\RenderableInterface
 {
 //    public function __construct(\League\Plates\Engine $templateRenderer);
     public function __invoke(ServerRequestInterface $request, array $args = []): ResponseInterface;
