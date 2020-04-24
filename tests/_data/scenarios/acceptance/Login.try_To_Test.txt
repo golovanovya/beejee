@@ -1,0 +1,8 @@
+I WANT TO TRY TO TEST
+
+I am on page '/login' 
+I fill field 'login'," 'admin' 
+I fill field 'password'," 'admin' 
+I click 'Войти' 
+I see 'Выйти'
+
