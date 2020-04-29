@@ -12,7 +12,8 @@
         "symfony/validator": "^5.0",
         "vlucas/phpdotenv": "^4.1",
         "doctrine/orm": "^2.7",
-        "pimple/pimple": "^3.3"
+        "pimple/pimple": "^3.3",
+        "mezzio/mezzio-authentication": "^1.1"
     },
     "require-dev": {
         "codeception/codeception": "^4.1",

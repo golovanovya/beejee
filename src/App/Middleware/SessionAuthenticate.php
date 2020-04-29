@@ -21,7 +21,7 @@ class SessionAuthenticate implements MiddlewareInterface
     private $sessionAttribute = 'session';
     private $userManager;
     
-    public function __construct(UserManager $userManager, string $segment = '')
+    public function __construct(\Mezzio\Authentication\UserRepositoryInterface $userManager, string $segment = '')
     {
         $this->userManager = $userManager;
         $this->segment = $segment;

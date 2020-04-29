@@ -13,9 +13,14 @@ $container['dbParams'] = [
     'user' => getenv('DB_USER'),
     'password' => getenv('DB_PASSWORD'),
 ];
-$container['adminUsers'] = [
-    getenv('ADMIN_LOGIN') => getenv('ADMIN_PASSWORD')
+$container['users'] = [
+    getenv('ADMIN_LOGIN') => [
+        'username' => getenv('ADMIN_LOGIN') ?? 'admin',
+        'password' => getenv('ADMIN_PASSWORD') ?? 'admin',
+        'roles' => '',
+    ]
 ];
+$container['admin'] = getenv('ADMIN_LOGIN');
 $container['entityPath'] = ['src/App/Entity'];
 $container['engineParams'] = [
     'viewsPath' => 'src/App/Views',
@@ -109,7 +114,7 @@ $container['router'] = function ($c) {
     $router->get('/login', App\Controller\LoginForm::class)
         ->middleware(new App\Middleware\ExtractFlashErrors());
     $router->post('/login', \App\Controller\Login::class)
-        ->middleware(new \App\Middleware\Validate($container->get('rules')['login']))
+        ->middleware(new \App\Middleware\Validate($c['rules']['login']))
         ->middleware(new \App\Middleware\HandleValidationErrors());
     $router->get('/logout', function (
         \Psr\Http\Message\ServerRequestInterface $request
@@ -124,23 +129,25 @@ $container['router'] = function ($c) {
     $router->get('/create', App\Controller\JobCreateForm::class)
         ->middleware(new App\Middleware\ExtractFlashErrors());
     $router->post('/create', \App\Controller\JobCreate::class)
-        ->middleware(new \App\Middleware\Validate($container->get('rules')['job']))
+        ->middleware(new \App\Middleware\Validate($c['rules']['job']))
         ->middleware(new \App\Middleware\HandleValidationErrors());
     $router->get('/update/{id:number}', App\Controller\JobUpdateForm::class)
         ->middleware(new App\Middleware\Authorize('@'))
         ->middleware(new App\Middleware\ExtractFlashErrors());
     $router->post('/update/{id:number}', \App\Controller\JobUpdate::class)
         ->middleware(new App\Middleware\Authorize('@'))
-        ->middleware(new \App\Middleware\Validate($container->get('rules')['job']))
+        ->middleware(new \App\Middleware\Validate($c['rules']['job']))
         ->middleware(new \App\Middleware\HandleValidationErrors());
     $router->middleware(new Middlewares\AuraSession())
-        ->middleware(new App\Middleware\SessionAuthenticate($container->get('userManager')))
+        ->middleware(new App\Middleware\SessionAuthenticate($c['userManager']))
         ->middleware(new App\Middleware\ValidateCsrf())
         ->middleware(new App\Middleware\ExtractFlashNotice())
         ->middleware(new \App\Middleware\GenerateCsrf());
     return $router;
 };
 
-$container['userManager'] = new \App\UserManager();
+$container['userManager'] = function ($c) {
+    return new \App\UserMemoryManager($c['users'], $c['admin']);
+};
 
 return new \Pimple\Psr11\Container($container);

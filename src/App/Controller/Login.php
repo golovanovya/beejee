@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\SessionTrait;
 use App\User;
-use App\UserManager;
+use Mezzio\Authentication\UserRepositoryInterface;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\Diactoros\Uri;
 use Psr\Http\Message\ResponseInterface;
@@ -17,7 +17,7 @@ class Login
     private $segment = '';
     private $userManager;
 
-    public function __construct(UserManager $userManager, string $segment = '')
+    public function __construct(UserRepositoryInterface $userManager, string $segment = '')
     {
         $this->userManager = $userManager;
         $this->segment = $segment;
@@ -27,13 +27,13 @@ class Login
     {
         $attributes = $request->getParsedBody();
         $args = $request->getQueryParams();
-        $user = $this->userManager->findUser($attributes['login']);
         $session = $this->extractSession($request);
         /* @var $referer Uri */
         $referer = new Uri($request->hasHeader('referer') ? $request->getHeaderLine('referer') : '/login');
         /* @var $redirect Uri */
         $redirect = new Uri(isset($args['redirect']) ? $args['redirect'] : '/');
-        if ($user !== null && $this->userManager->validatePassword($user, $attributes['password'])) {
+        $user = $this->userManager->authenticate($attributes['login'], $attributes['password']);
+        if ($user !== null) {
             $this->setSessionData($session, User::KEY, $attributes['login'], $this->segment);
             return new RedirectResponse($redirect);
         }

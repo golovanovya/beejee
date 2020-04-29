@@ -34,7 +34,7 @@ $getSortUrl = function ($attribute, bool $reverse = true, bool $pagination = tru
         <tr>
             <th scope="col" width="20%"><a href="<?= $getSortUrl('name') ?>">имя пользователя <?= $getIcon('name') ?></a></th>
             <th scope="col" width="20%"><a href="<?= $getSortUrl('email') ?>">e-mail <?= $getIcon('email') ?></th>
-            <th scope="col" width="40%">текст задачи</a></th>
+            <th scope="col" width="40%">текст задачи</th>
             <th scope="col" width="10%"><a href="<?= $getSortUrl('status') ?>">статус <?= $getIcon('status') ?></a></th>
             <th scope="col" width="5%"></th>
             <th scope="col" width="5%"></th>

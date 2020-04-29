@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d78f08f4d84a7304747776e9a483bb15",
+    "content-hash": "ca5e15da841d9e3a26b25dd4cfbddb88",
     "packages": [
         {
             "name": "aura/session",
@@ -1352,6 +1352,75 @@
                 "router"
             ],
             "time": "2019-07-01T19:36:07+00:00"
+        },
+        {
+            "name": "mezzio/mezzio-authentication",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mezzio/mezzio-authentication.git",
+                "reference": "1a8d9ded27530b6243cf9d295e3f1a57608d0abf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mezzio/mezzio-authentication/zipball/1a8d9ded27530b6243cf9d295e3f1a57608d0abf",
+                "reference": "1a8d9ded27530b6243cf9d295e3f1a57608d0abf",
+                "shasum": ""
+            },
+            "require": {
+                "laminas/laminas-zendframework-bridge": "^1.0",
+                "php": "^7.1",
+                "psr/container": "^1.0",
+                "psr/http-message": "^1.0.1",
+                "psr/http-server-middleware": "^1.0"
+            },
+            "conflict": {
+                "container-interop/container-interop": "<1.2.0"
+            },
+            "replace": {
+                "zendframework/zend-expressive-authentication": "self.version"
+            },
+            "require-dev": {
+                "laminas/laminas-coding-standard": "~1.0.0",
+                "phpunit/phpunit": "^7.0.2"
+            },
+            "suggest": {
+                "ext-pdo": "*: for use with the PDO-backed UserRepositoryInterface implementation",
+                "mezzio/mezzio-authentication-basic": "Provides an HTTP Basic Authentication AuthenticationInterface implementation",
+                "mezzio/mezzio-authentication-laminasauthentication": "Provides a laminas-authentication AuthenticationInterface implementation",
+                "mezzio/mezzio-authentication-session": "Provides a username/password + session AuthenticationInterface implementation"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev",
+                    "dev-develop": "1.2.x-dev"
+                },
+                "laminas": {
+                    "config-provider": "Mezzio\\Authentication\\ConfigProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mezzio\\Authentication\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Authentication middleware for Mezzio and PSR-7 applications",
+            "homepage": "https://mezzio.dev",
+            "keywords": [
+                "Authentication",
+                "http",
+                "laminas",
+                "mezzio",
+                "middleware",
+                "psr-15",
+                "psr-7"
+            ],
+            "time": "2019-12-31T15:42:30+00:00"
         },
         {
             "name": "middlewares/aura-session",
