@@ -3,7 +3,6 @@
 namespace tests\acceptance;
 
 use AcceptanceTester;
-use Dotenv\Dotenv;
 use Page\Acceptance\Login;
 
 class LoginCest

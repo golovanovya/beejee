@@ -10,3 +10,9 @@ extensions:
         - Codeception\Extension\RunFailed
 params:
     - .env
+modules:
+    config:
+        Db:
+            dsn: "%DB_DSN%"
+            user: "%DB_USER%"
+            password: "%DB_PASS%"

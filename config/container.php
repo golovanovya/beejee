@@ -8,10 +8,10 @@ $container = new \Pimple\Container();
 // ===== PARAMS =========
 $container['dbParams'] = [
     'driver' => 'pdo_mysql',
-    'host' => getenv('DB_HOST'),
-    'dbname' => getenv('DB_NAME'),
+    'url' => getenv('DB_URL'),
+    'dsn' => getenv('DB_DSN'),
     'user' => getenv('DB_USER'),
-    'password' => getenv('DB_PASSWORD'),
+    'password' => getenv('DB_PASS'),
 ];
 $container['users'] = [
     getenv('ADMIN_LOGIN') => [
@@ -40,11 +40,14 @@ $container['annotationConfig'] = function ($c) {
     return Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, $proxyDir, $cache, $useSimpleAnnotationReader);
 };
 $container['em'] = function ($c) {
-    return Doctrine\ORM\EntityManager::create($c['dbParams'], $c['annotationConfig']);
+    return Doctrine\ORM\EntityManager::create([
+        'url' => $c['dbParams']['url'],
+        'driver' => $c['dbParams']['driver'],
+    ], $c['annotationConfig']);
 };
 $container[\PDO::class] = function ($c) {
     $pdo = new \PDO(
-        sprintf('mysql:host=%s;dbname=%s', $c['dbParams']['host'], $c['dbParams']['dbname']),
+        $c['dbParams']['dsn'],
         $c['dbParams']['user'],
         $c['dbParams']['password'],
         [
