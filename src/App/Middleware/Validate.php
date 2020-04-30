@@ -35,7 +35,10 @@ class Validate implements MiddlewareInterface
     {
         $errors = [];
         foreach ($this->rules as $name => $rules) {
-            $attributeErrors = $this->validateAttribute($attributes[$name], $rules);
+            $attributeErrors = $this->validateAttribute(
+                isset($attributes[$name]) ? $attributes[$name] : null,
+                $rules
+            );
             if (!empty($attributeErrors)) {
                 $errors[$name] = $attributeErrors;
             }

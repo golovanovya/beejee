@@ -11,8 +11,8 @@ extensions:
 params:
     - .env
 modules:
-    config:
-        Db:
+    enabled:
+        - Db:
             dsn: "%DB_DSN%"
             user: "%DB_USER%"
             password: "%DB_PASS%"
