@@ -8,6 +8,6 @@ actor: AcceptanceTester
 modules:
     enabled:
         - PhpBrowser:
-            url: http://beejee.local
+            url: "http://%HOST%"
         - \Helper\Acceptance
     step_decorators: ~        
